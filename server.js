@@ -31,6 +31,7 @@ async function startServer() {
 
 // Start the server
 startServer();
+
 app.listen(port, () => {
   console.log(`Event Management is running on port ${port}`);
 });

@@ -17,9 +17,6 @@ async function connectDB() {
   try {
     // await client.connect();
     console.log("Successfully connected to MongoDB!");
-    const db = client.db("event-management");
-
-    return db;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
   }

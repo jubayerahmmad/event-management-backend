@@ -28,10 +28,25 @@ router.post("/save-user", async (req, res) => {
   }
 
   userInfo.createdAt = new Date();
+  userInfo.token = crypto.randomBytes(32).toString("hex");
 
   try {
     const result = await userCollection.insertOne(userInfo);
-    res.status(200).send(result);
+
+    if (result.insertedId) {
+      // Send back necessary info
+      const responseUser = {
+        _id: result.insertedId,
+        name: userInfo.name,
+        email: userInfo.email,
+        photoURL: userInfo.photoURL,
+        token: userInfo.token,
+      };
+
+      return res.status(200).send(responseUser);
+    } else {
+      return res.status(500).send({ message: "Failed to save user" });
+    }
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
@@ -67,13 +82,10 @@ router.post("/login", async (req, res) => {
   await userCollection.updateOne({ email }, { $set: { token } });
 
   res.status(200).send({
-    message: "Login Successful",
+    email: user.email,
+    name: user.name,
+    photoURL: user?.photoURL || "https://i.ibb.co/KX2TZyk/man.png",
     token,
-    user: {
-      email: user.email,
-      name: user.name,
-      photoURL: user?.photoURL || "https://i.ibb.co/KX2TZyk/man.png",
-    },
   });
 });
 
