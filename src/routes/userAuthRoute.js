@@ -3,6 +3,8 @@ const { db } = require("../config/db");
 const router = express.Router();
 const crypto = require("crypto");
 
+const userCollection = db.collection("users");
+
 // save user to db
 router.post("/save-user", async (req, res) => {
   const userInfo = req.body;
@@ -20,7 +22,7 @@ router.post("/save-user", async (req, res) => {
   console.log("userInfo", userInfo);
 
   // check if user already exists
-  const user = await db.collection("users").findOne({ email: userInfo.email });
+  const user = await userCollection.findOne({ email: userInfo.email });
   if (user) {
     return res.status(400).send({ message: "User already exists" });
   }
@@ -28,11 +30,51 @@ router.post("/save-user", async (req, res) => {
   userInfo.createdAt = new Date();
 
   try {
-    const result = await db.collection("users").insertOne(userInfo);
+    const result = await userCollection.insertOne(userInfo);
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
+});
+
+// login user
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const hashedPassword = crypto
+    .createHash("sha256")
+    .update(password)
+    .digest("hex");
+
+  // check if user is registered
+  const user = await userCollection.findOne({
+    email,
+    password: hashedPassword,
+  });
+
+  if (user.email === email && user.password !== hashedPassword) {
+    return res.status(400).send({ message: "Invalid password" });
+  }
+
+  if (!user) {
+    return res.status(401).send({ message: "Invalid credentials" });
+  }
+
+  // generate token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // save token to db
+  await userCollection.updateOne({ email }, { $set: { token } });
+
+  res.status(200).send({
+    message: "Login Successful",
+    token,
+    user: {
+      email: user.email,
+      name: user.name,
+      photoURL: user?.photoURL || "https://i.ibb.co/KX2TZyk/man.png",
+    },
+  });
 });
 
 module.exports = router;
