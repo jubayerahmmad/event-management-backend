@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../config/db");
 const { ObjectId } = require("mongodb");
+const verifyToken = require("../middlewares/verifyToken");
 
 const eventsCollection = db.collection("events");
 
 // save event
-router.post("/add-event", async (req, res) => {
+router.post("/add-event", verifyToken, async (req, res) => {
   const eventInfo = req.body;
 
   const { organizerName, title, description, date, time, location, userEmail } =
@@ -54,7 +55,7 @@ router.get("/events", async (req, res) => {
 });
 
 // get events for a specific user
-router.get("/events/:email", async (req, res) => {
+router.get("/events/:email", verifyToken, async (req, res) => {
   const email = req.params.email;
   try {
     const result = await eventsCollection.find({ userEmail: email }).toArray();
@@ -92,7 +93,7 @@ router.patch("/events/:id", async (req, res) => {
 });
 
 // delete event
-router.delete("/events/:id", async (req, res) => {
+router.delete("/events/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
 
   try {
