@@ -45,8 +45,16 @@ router.post("/add-event", verifyToken, async (req, res) => {
 
 // get all events
 router.get("/events", async (req, res) => {
+  const search = req.query.search;
+
+  let query = {};
+
+  if (search) {
+    query = { title: { $regex: search, $options: "i" } };
+  }
+
   try {
-    const result = await eventsCollection.find({}).toArray();
+    const result = await eventsCollection.find(query).toArray();
 
     res.status(200).send(result);
   } catch (error) {
