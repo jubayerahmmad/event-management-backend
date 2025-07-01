@@ -53,6 +53,24 @@ router.get("/events", async (req, res) => {
   }
 });
 
+// get a event by id
+router.get("/events/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await eventsCollection.findOne(query);
+
+    if (result) {
+      return res.status(200).send(result);
+    } else {
+      return res.status(404).send({ message: "Event not found" });
+    }
+  } catch (error) {
+    return res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 // get events for a specific user
 router.get("/events/:email", verifyToken, async (req, res) => {
   const email = req.params.email;
