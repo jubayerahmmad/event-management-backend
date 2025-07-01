@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const { connectDB } = require("./src/config/db");
 const userAuthRoute = require("./src/routes/userAuthRoute");
+const addEventRoute = require("./src/routes/addEventRoute");
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/user", userAuthRoute);
+app.use("/api/event", addEventRoute);
 
 // Start server and connect to database
 async function startServer() {
