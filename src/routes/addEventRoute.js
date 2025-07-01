@@ -3,6 +3,7 @@ const router = express.Router();
 const { db } = require("../config/db");
 const { ObjectId } = require("mongodb");
 const verifyToken = require("../middlewares/verifyToken");
+const e = require("express");
 
 const eventsCollection = db.collection("events");
 
@@ -72,8 +73,9 @@ router.get("/events/:id", async (req, res) => {
 });
 
 // get events for a specific user
-router.get("/events/:email", verifyToken, async (req, res) => {
+router.get("/my-events/:email", verifyToken, async (req, res) => {
   const email = req.params.email;
+
   try {
     const result = await eventsCollection.find({ userEmail: email }).toArray();
 

@@ -2,7 +2,6 @@ const { db } = require("../config/db");
 
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  // console.log("authHeader", authHeader);
 
   if (!authHeader) {
     return res
