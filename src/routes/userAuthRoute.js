@@ -67,10 +67,6 @@ router.post("/login", async (req, res) => {
     password: hashedPassword,
   });
 
-  if (user.email === email && user.password !== hashedPassword) {
-    return res.status(400).send({ message: "Invalid password" });
-  }
-
   if (!user) {
     return res.status(401).send({ message: "Invalid credentials" });
   }

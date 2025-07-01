@@ -26,10 +26,9 @@ router.post("/add-event", verifyToken, async (req, res) => {
   }
 
   eventInfo.createdAt = new Date();
+
   try {
     const result = await eventsCollection.insertOne(eventInfo);
-
-    console.log("result from post req (add event)", result);
 
     if (result.insertedId) {
       return res
@@ -47,7 +46,7 @@ router.post("/add-event", verifyToken, async (req, res) => {
 router.get("/events", async (req, res) => {
   try {
     const result = await eventsCollection.find({}).toArray();
-    console.log("result from get req (all events)", result);
+
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
@@ -59,7 +58,7 @@ router.get("/events/:email", verifyToken, async (req, res) => {
   const email = req.params.email;
   try {
     const result = await eventsCollection.find({ userEmail: email }).toArray();
-    console.log("result from get req (events for a specific user)", result);
+
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
@@ -77,8 +76,6 @@ router.patch("/events/:id", async (req, res) => {
     const result = await eventsCollection.updateOne(query, {
       $set: updatedEvent,
     });
-
-    console.log("result from patch req (update event)", result);
 
     if (result.modifiedCount) {
       return res
@@ -99,8 +96,6 @@ router.delete("/events/:id", verifyToken, async (req, res) => {
   try {
     const query = { _id: new ObjectId(id) };
     const result = await eventsCollection.deleteOne(query);
-
-    console.log("result from delete req (delete event)", result);
 
     if (result.deletedCount) {
       return res
